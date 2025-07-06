@@ -75,3 +75,7 @@ code {
     flex-direction: column;
   }
 }
+
+.samsung-700 {
+  font-family: 'SamsungOne-700';
+}

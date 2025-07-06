@@ -30,11 +30,11 @@
   }
   
   /* Font & Title */
-  .card-title-custom {
-    font-family: 'SamsungSharpSansBold';
-    font-size: 1.5rem;
-    color: var(--text-color);
-  }
+.card-title-custom {
+  font-family: 'SamsungSharpSansBold';
+  font-size: 1.25rem !important;
+  color: var(--text-color);
+}
   
   .samsung-font {
     font-family: 'SamsungSharpSansBold';
@@ -97,4 +97,28 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
+.btn-gray-custom {
+  background-color: #adb5bd;
+  border: 1px solid #adb5bd;
+  color: #ffffff;
+  font-family: 'SamsungSharpSansBold';
+  transition: background-color 0.3s ease;
+}
+
+.btn-gray-custom:hover {
+  background-color: #868e96;
+  border-color: #868e96;
+  box-shadow: 0 4px 12px rgba(173, 181, 189, 0.3);
+  cursor: pointer;
+}
+
+.pi-info-circle {
+  transition: transform 0.2s ease;
+}
+
+.pi-info-circle:hover {
+  transform: scale(1.2);
+}
+
   

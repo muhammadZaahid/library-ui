@@ -5,20 +5,20 @@
     transition: all 0.3s ease;
     font-family: 'SamsungSharpSansBold';
   }
-  
+
   .btn-primary-custom:hover {
     background-color: #1577e0;
     border-color: #1577e0;
     box-shadow: 0 4px 12px rgba(32, 137, 255, 0.3);
     cursor: pointer;
   }
-  
-  .card-title-custom {
-    font-family: 'SamsungSharpSansBold';
-    font-size: 1.5rem; /* opsional */
-    color: var(--text-color); /* opsional, ikut tema PrimeReact */
-  }
 
+.card-title-custom {
+  font-size: 1.35rem !important;
+  margin: 0;
+  font-family: 'SamsungSharpSansBold';
+  color: var(--text-color);
+}
   .btn-danger-custom {
     background-color: #fa5252;
     border: 1px solid #fa5252;
@@ -26,7 +26,7 @@
     font-family: 'SamsungSharpSansBold';
     transition: background-color 0.3s ease;
   }
-  
+
   .btn-danger-custom:hover {
     background-color: #e64949;
     border-color: #e64949;
@@ -47,13 +47,13 @@
     padding-left: 2.5rem !important;
     height: 2.5rem;
   }
-  
+
   .p-input-icon-left > i.pi {
     left: 1rem; /* Geser ikon sedikit ke kanan */
     font-size: 0.9rem;
     color: var(--text-color-secondary);
   }
-  
+
   .search-input {
     padding-left: 2.5rem !important; /* Tambahkan padding kiri agar tidak menabrak ikon */
     color: #000000;
@@ -68,7 +68,7 @@
     width: 400px !important;
     font-size: 0.85rem;
   }
-  
+
   /* Efek fade & opacity untuk toast item */
   .p-toast-message {
     opacity: 0.95;
@@ -76,32 +76,72 @@
     border-radius: 0.75rem;
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
-  
+
   /* Animasi masuk */
   .p-toast-message-enter {
     transform: translateY(-10px);
     opacity: 0;
   }
-  
+
   .p-toast-message-enter-active {
     transform: translateY(0);
     opacity: 1;
   }
-  
+
   /* Animasi keluar */
   .p-toast-message-exit {
     opacity: 1;
   }
-  
+
   .p-toast-message-exit-active {
     opacity: 0;
     transform: translateY(-10px);
   }
-  
-  
-  
 
-  
+.btn-cancel-custom {
+  background-color: #a8b0b9;
+  border: 1px solid #a8b0b9;
+  color: #ffffff;
+  font-family: 'SamsungSharpSansBold';
+  transition: background-color 0.3s ease;
+}
 
-  
-  
+.btn-cancel-custom:hover {
+  background-color: #949da5;
+  border-color: #949da5;
+  box-shadow: 0 4px 12px rgba(168, 176, 185, 0.3);
+  cursor: pointer;
+}
+
+.btn-gray-custom {
+  background-color: #adb5bd;
+  border: 1px solid #adb5bd;
+  color: #ffffff;
+  font-family: 'SamsungSharpSansBold';
+  transition: background-color 0.3s ease;
+}
+
+.btn-gray-custom:hover {
+  background-color: #868e96;
+  border-color: #868e96;
+  box-shadow: 0 4px 12px rgba(173, 181, 189, 0.3);
+  cursor: pointer;
+}
+
+.pi-info-circle {
+  transition: transform 0.2s ease;
+}
+
+.pi-info-circle:hover {
+  transform: scale(1.2);
+}
+
+
+
+
+
+
+
+
+
+

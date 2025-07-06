@@ -5,14 +5,16 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
+import { Dialog } from 'primereact/dialog';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import './Author.css';
-import { Link } from 'react-router-dom';
 
 const AuthorList = () => {
     const [authors, setAuthors] = useState([]);
     const [selectedAuthors, setSelectedAuthors] = useState([]);
     const [inquiry, setInquiry] = useState('');
+    const [showInfo, setShowInfo] = useState(false);
     const toast = useRef(null);
 
     const loadAuthors = async (query = '') => {
@@ -77,8 +79,36 @@ const AuthorList = () => {
     return (
         <div className="p-4">
             <Toast ref={toast} />
+
+            {/* Title & Info */}
+            <div className="flex justify-content-between align-items-center mb-3">
+                <div className="flex align-items-center gap-2">
+                    <h1 className="text-3xl text-gray-800 samsung-bold m-0">Author</h1>
+                    <i
+                        className="pi pi-info-circle text-primary text-xl cursor-pointer"
+                        onClick={() => setShowInfo(true)}
+                        title="What is this page?"
+                    />
+                </div>
+            </div>
+
+            {/* Info Dialog */}
+            <Dialog
+                header="What is Author Page?"
+                visible={showInfo}
+                style={{ width: '40vw' }}
+                onHide={() => setShowInfo(false)}
+                draggable={false}
+                className="samsung-400"
+            >
+                <p className="m-0 text-sm">
+                    This page displays a list of authors in the system. You can search, edit, add, or delete author data here.
+                </p>
+            </Dialog>
+
+            {/* Card and Content */}
             <Card className="shadow-3">
-                {/* Header */}
+                {/* Header Card */}
                 <div className="flex justify-content-between align-items-center mb-3">
                     <h2 className="card-title-custom m-0 samsung-bold">Author List</h2>
                     <div className="flex align-items-center gap-2">
@@ -101,25 +131,24 @@ const AuthorList = () => {
                     </div>
                 </div>
 
-                {/* Divider */}
                 <hr className="mb-3 mt-1" />
 
-                {/* Search Bar */}
+                {/* Search */}
                 <div className="flex align-items-center mb-3 gap-2" style={{ maxWidth: '360px' }}>
-                    <span className="p-input-icon-left w-full">
-                        <i className="pi pi-search" />
-                        <InputText
-                            value={inquiry}
-                            onChange={(e) => setInquiry(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    loadAuthors(inquiry);
-                                }
-                            }}
-                            placeholder="Search author by name..."
-                            className="p-inputtext-sm w-full rounded-input samsung-400 search-input"
-                        />
-                    </span>
+          <span className="p-input-icon-left w-full">
+            <i className="pi pi-search" />
+            <InputText
+                value={inquiry}
+                onChange={(e) => setInquiry(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        loadAuthors(inquiry);
+                    }
+                }}
+                placeholder="Search author by name..."
+                className="p-inputtext-sm w-full rounded-input samsung-400 search-input"
+            />
+          </span>
 
                     <Button
                         icon="pi pi-sync"
@@ -140,8 +169,6 @@ const AuthorList = () => {
                         tooltipOptions={{ position: 'top' }}
                     />
                 </div>
-
-
 
                 {/* Table */}
                 <DataTable
