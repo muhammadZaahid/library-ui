@@ -1,0 +1,100 @@
+/* Buttons */
+.btn-primary-custom {
+    background-color: #2089ff;
+    border: 1px solid #2089ff;
+    color: #ffffff;
+    transition: all 0.3s ease;
+    font-family: 'SamsungSharpSansBold';
+  }
+  
+  .btn-primary-custom:hover {
+    background-color: #1577e0;
+    border-color: #1577e0;
+    box-shadow: 0 4px 12px rgba(32, 137, 255, 0.3);
+    cursor: pointer;
+  }
+  
+  .btn-danger-custom {
+    background-color: #fa5252;
+    border: 1px solid #fa5252;
+    color: #ffffff;
+    font-family: 'SamsungSharpSansBold';
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-danger-custom:hover {
+    background-color: #e64949;
+    border-color: #e64949;
+    box-shadow: 0 4px 12px rgba(250, 82, 82, 0.3);
+    cursor: pointer;
+  }
+  
+  /* Font & Title */
+  .card-title-custom {
+    font-family: 'SamsungSharpSansBold';
+    font-size: 1.5rem;
+    color: var(--text-color);
+  }
+  
+  .samsung-font {
+    font-family: 'SamsungSharpSansBold';
+  }
+  
+  .samsung-400 {
+    font-family: 'SamsungOne-400';
+  }
+  
+  /* Search input */
+  .rounded-input {
+    border-radius: 2rem !important;
+    padding-left: 2.5rem !important;
+    height: 2.5rem;
+  }
+  
+  .p-input-icon-left > i.pi {
+    left: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+  }
+  
+  .search-input {
+    padding-left: 2.5rem !important;
+    color: #000000;
+  }
+  
+  .search-input::placeholder {
+    color: #888888;
+  }
+  
+  /* Toast style */
+  .p-toast {
+    width: 400px !important;
+    font-size: 0.85rem;
+  }
+  
+  .p-toast-message {
+    opacity: 0.95;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0.75rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .p-toast-message-enter {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  
+  .p-toast-message-enter-active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .p-toast-message-exit {
+    opacity: 1;
+  }
+  
+  .p-toast-message-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  

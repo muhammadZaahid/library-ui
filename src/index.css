@@ -1,13 +1,77 @@
+
+/* Import Bootstrap (opsional, bisa kamu hapus jika tak dipakai) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+
+
+/* Gunakan PrimeReact variable theme */
 body {
+  font-family: var(--font-family);
+  background-color: var(--surface-ground);
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
+/* Layout Container Default */
+.p-container,
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Heading */
+h1, h2, h3, h4 {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+/* Table tweak */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Code blocks */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Button spacing */
+.p-button {
+  margin-right: 0.5rem;
+}
+
+/* Utility spacing if needed */
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Navbar */
+.p-menubar {
+  border-radius: 0;
+  padding: 0.5rem 1rem;
+}
+
+/* Card (optional) */
+.card {
+  border-radius: 12px;
+  background-color: var(--surface-card);
+  box-shadow: var(--shadow-2);
+  padding: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .p-menubar-root-list {
+    flex-direction: column;
+  }
 }
