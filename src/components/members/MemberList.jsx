@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
@@ -15,14 +16,39 @@ const MemberList = () => {
     const [selectedMembers, setSelectedMembers] = useState([]);
     const [inquiry, setInquiry] = useState('');
     const [showInfo, setShowInfo] = useState(false);
-    const toast = useRef(null);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        size: 10,
+        totalRecords: 0,
+    });
 
-    const loadMembers = async (query = '') => {
-        const res = await api.get('/members', {
-            params: query ? { inquiry: query } : {},
-        });
-        setMembers(res.data);
-    };
+    const toast = useRef(null);
+    const rowsPerPageOptions = [5, 10, 20, 50];
+
+    const loadMembers = useCallback(async () => {
+        try {
+            const res = await api.get('/members', {
+                params: {
+                    inquiry,
+                    page: pagination.page,
+                    size: pagination.size,
+                },
+            });
+
+            setMembers(res.data.content);
+            setPagination((prev) => ({
+                ...prev,
+                totalRecords: res.data.totalElements,
+            }));
+        } catch (error) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Failed to load members',
+                detail: 'Please check your API or network.',
+                life: 3000,
+            });
+        }
+    }, [inquiry, pagination.page, pagination.size]);
 
     const handleBulkDelete = async () => {
         const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedMembers.length} member(s)?`);
@@ -30,7 +56,7 @@ const MemberList = () => {
             const ids = selectedMembers.map((member) => member.id);
             await api.post('/members/bulk-delete', ids);
             setSelectedMembers([]);
-            loadMembers(inquiry);
+            loadMembers();
 
             toast.current.show({
                 severity: 'success',
@@ -45,7 +71,7 @@ const MemberList = () => {
         const { newData } = e;
         try {
             await api.put(`/members/${newData.id}`, newData);
-            loadMembers(inquiry);
+            loadMembers();
 
             toast.current.show({
                 severity: 'success',
@@ -72,9 +98,17 @@ const MemberList = () => {
         />
     );
 
+    const onPageChange = (e) => {
+        setPagination((prev) => ({
+            ...prev,
+            page: Math.floor(e.first / e.rows),
+            size: e.rows,
+        }));
+    };
+
     useEffect(() => {
         loadMembers();
-    }, []);
+    }, [loadMembers]);
 
     return (
         <div className="p-4">
@@ -106,9 +140,8 @@ const MemberList = () => {
                 </p>
             </Dialog>
 
-            {/* Card and Content */}
+            {/* Card */}
             <Card className="shadow-3">
-                {/* Header Card */}
                 <div className="flex justify-content-between align-items-center mb-3">
                     <h2 className="card-title-custom m-0 samsung-bold">Member List</h2>
                     <div className="flex align-items-center gap-2">
@@ -142,7 +175,7 @@ const MemberList = () => {
                             onChange={(e) => setInquiry(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    loadMembers(inquiry);
+                                    setPagination((prev) => ({ ...prev, page: 0 }));
                                 }
                             }}
                             placeholder="Search member by name..."
@@ -162,16 +195,17 @@ const MemberList = () => {
                         }}
                         onClick={() => {
                             setInquiry('');
-                            loadMembers('');
+                            setPagination((prev) => ({ ...prev, page: 0 }));
                         }}
                         tooltip="Refresh"
                         tooltipOptions={{ position: 'top' }}
                     />
                 </div>
 
-                {/* Table */}
+                {/* DataTable */}
                 <DataTable
                     value={members}
+                    lazy
                     editMode="row"
                     dataKey="id"
                     onRowEditComplete={onRowEditComplete}
@@ -179,10 +213,28 @@ const MemberList = () => {
                     onSelectionChange={(e) => setSelectedMembers(e.value)}
                     selectionMode="checkbox"
                     paginator
-                    rows={5}
+                    rows={pagination.size}
+                    totalRecords={pagination.totalRecords}
+                    first={pagination.page * pagination.size}
+                    onPage={onPageChange}
+                    rowsPerPageOptions={rowsPerPageOptions}
                     stripedRows
                     responsiveLayout="scroll"
                     className="p-datatable-sm"
+                    paginatorTemplate={{
+                        layout: 'PrevPageLink PageLinks NextPageLink RowsPerPageDropdown',
+                        RowsPerPageDropdown: (options) => (
+                            <div className="custom-rows-dropdown">
+                                <span className="text-sm">Rows per page:</span>
+                                <Dropdown
+                                    value={options.value}
+                                    options={options.options}
+                                    onChange={options.onChange}
+                                    className="p-dropdown-sm"
+                                />
+                            </div>
+                        ),
+                    }}
                 >
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
                     <Column

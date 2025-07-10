@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
@@ -7,6 +7,7 @@ import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import './Borrowed.css';
@@ -16,14 +17,38 @@ const BorrowedList = () => {
     const [selectedBorrowed, setSelectedBorrowed] = useState([]);
     const [inquiry, setInquiry] = useState('');
     const [showInfo, setShowInfo] = useState(false);
-    const toast = useRef(null);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        size: 10,
+        totalRecords: 0,
+    });
 
-    const loadBorrowedBooks = async (query = '') => {
-        const res = await api.get('/borrowed-books', {
-            params: query ? { inquiry: query } : {},
-        });
-        setBorrowedBooks(res.data);
-    };
+    const toast = useRef(null);
+    const rowsPerPageOptions = [5, 10, 20, 50];
+
+    const loadBorrowedBooks = useCallback(async () => {
+        try {
+            const res = await api.get('/borrowed-books', {
+                params: {
+                    inquiry,
+                    page: pagination.page,
+                    size: pagination.size,
+                },
+            });
+            setBorrowedBooks(res.data.content);
+            setPagination((prev) => ({
+                ...prev,
+                totalRecords: res.data.totalElements,
+            }));
+        } catch (error) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Failed to load data',
+                detail: 'Please check your network or API.',
+                life: 3000,
+            });
+        }
+    }, [inquiry, pagination.page, pagination.size]);
 
     const handleBulkDelete = async () => {
         const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedBorrowed.length} item(s)?`);
@@ -31,7 +56,7 @@ const BorrowedList = () => {
             const ids = selectedBorrowed.map((item) => item.id);
             await api.post('/borrowed-books/bulk-delete', ids);
             setSelectedBorrowed([]);
-            loadBorrowedBooks(inquiry);
+            loadBorrowedBooks();
 
             toast.current.show({
                 severity: 'success',
@@ -46,7 +71,7 @@ const BorrowedList = () => {
         const { newData } = e;
         try {
             await api.put(`/borrowed-books/${newData.id}`, newData);
-            loadBorrowedBooks(inquiry);
+            loadBorrowedBooks();
 
             toast.current.show({
                 severity: 'success',
@@ -80,9 +105,17 @@ const BorrowedList = () => {
         />
     );
 
+    const onPageChange = (e) => {
+        setPagination((prev) => ({
+            ...prev,
+            page: Math.floor(e.first / e.rows),
+            size: e.rows,
+        }));
+    };
+
     useEffect(() => {
         loadBorrowedBooks();
-    }, []);
+    }, [loadBorrowedBooks]);
 
     return (
         <div className="p-4">
@@ -114,9 +147,8 @@ const BorrowedList = () => {
                 </p>
             </Dialog>
 
-            {/* Card and Content */}
+            {/* Card */}
             <Card className="shadow-3">
-                {/* Header */}
                 <div className="flex justify-content-between align-items-center mb-3">
                     <h2 className="card-title-custom m-0 samsung-bold">Borrowed Books</h2>
                     <div className="flex align-items-center gap-2">
@@ -139,10 +171,9 @@ const BorrowedList = () => {
                     </div>
                 </div>
 
-                {/* Divider */}
                 <hr className="mb-3 mt-1" />
 
-                {/* Search Bar */}
+                {/* Search */}
                 <div className="flex align-items-center mb-3 gap-2" style={{ maxWidth: '360px' }}>
                     <span className="p-input-icon-left w-full">
                         <i className="pi pi-search" />
@@ -151,14 +182,13 @@ const BorrowedList = () => {
                             onChange={(e) => setInquiry(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    loadBorrowedBooks(inquiry);
+                                    setPagination((prev) => ({ ...prev, page: 0 }));
                                 }
                             }}
                             placeholder="Search by book or member..."
                             className="p-inputtext-sm w-full rounded-input samsung-400 search-input"
                         />
                     </span>
-
                     <Button
                         icon="pi pi-sync"
                         className="p-button-text p-button-sm"
@@ -172,16 +202,17 @@ const BorrowedList = () => {
                         }}
                         onClick={() => {
                             setInquiry('');
-                            loadBorrowedBooks('');
+                            setPagination((prev) => ({ ...prev, page: 0 }));
                         }}
                         tooltip="Refresh"
                         tooltipOptions={{ position: 'top' }}
                     />
                 </div>
 
-                {/* Table */}
+                {/* DataTable */}
                 <DataTable
                     value={borrowedBooks}
+                    lazy
                     editMode="row"
                     dataKey="id"
                     onRowEditComplete={onRowEditComplete}
@@ -189,10 +220,28 @@ const BorrowedList = () => {
                     onSelectionChange={(e) => setSelectedBorrowed(e.value)}
                     selectionMode="checkbox"
                     paginator
-                    rows={5}
+                    rows={pagination.size}
+                    totalRecords={pagination.totalRecords}
+                    first={pagination.page * pagination.size}
+                    onPage={onPageChange}
+                    rowsPerPageOptions={rowsPerPageOptions}
                     stripedRows
                     responsiveLayout="scroll"
                     className="p-datatable-sm"
+                    paginatorTemplate={{
+                        layout: 'PrevPageLink PageLinks NextPageLink RowsPerPageDropdown',
+                        RowsPerPageDropdown: (options) => (
+                            <div className="custom-rows-dropdown">
+                                <span className="text-sm">Rows per page:</span>
+                                <Dropdown
+                                    value={options.value}
+                                    options={options.options}
+                                    onChange={options.onChange}
+                                    className="p-dropdown-sm"
+                                />
+                            </div>
+                        ),
+                    }}
                 >
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
                     <Column

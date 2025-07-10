@@ -121,4 +121,52 @@
   transform: scale(1.2);
 }
 
+.p-paginator-bottom {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  padding-right: 14rem;
+}
+
+.custom-paginator-table .p-paginator-bottom {
+  position: relative;
+  padding-left: 14rem;
+  justify-content: center !important;
+}
+
+/* Dropdown size di kanan bawah */
+.custom-rows-dropdown {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .custom-rows-dropdown {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .p-datatable .p-column-title {
+    font-weight: 600;
+  }
+
+  .p-datatable .p-cell-data {
+    word-break: break-word;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
   

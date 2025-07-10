@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
@@ -15,29 +15,50 @@ const BookList = () => {
     const [books, setBooks] = useState([]);
     const [selectedBooks, setSelectedBooks] = useState([]);
     const [inquiry, setInquiry] = useState('');
-    const [authors, setAuthors] = useState([]);
     const [showInfo, setShowInfo] = useState(false);
+    const [pagination, setPagination] = useState({
+        page: 0,
+        size: 10,
+        totalRecords: 0,
+    });
+
     const toast = useRef(null);
+    const rowsPerPageOptions = [5, 10, 20, 50];
 
-    const loadBooks = async (query = '') => {
-        const res = await api.get('/books', {
-            params: query ? { inquiry: query } : {},
-        });
-        setBooks(res.data);
-    };
+    const loadBooks = useCallback(async () => {
+        try {
+            const res = await api.get('/books', {
+                params: {
+                    inquiry,
+                    page: pagination.page,
+                    size: pagination.size,
+                },
+            });
 
-    const loadAuthors = async () => {
-        const res = await api.get('/authors');
-        setAuthors(res.data);
-    };
+            setBooks(res.data.content);
+            setPagination((prev) => ({
+                ...prev,
+                totalRecords: res.data.totalElements,
+            }));
+        } catch (error) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Failed to load books',
+                detail: 'Please check your API or network.',
+                life: 3000,
+            });
+        }
+    }, [inquiry, pagination.page, pagination.size]);
 
     const handleBulkDelete = async () => {
-        const confirmDelete = window.confirm(`Are you sure you want to delete ${selectedBooks.length} book(s)?`);
+        const confirmDelete = window.confirm(
+            `Are you sure you want to delete ${selectedBooks.length} book(s)?`
+        );
         if (confirmDelete) {
             const ids = selectedBooks.map((book) => book.id);
             await api.post('/books/bulk-delete', ids);
             setSelectedBooks([]);
-            loadBooks(inquiry);
+            loadBooks();
 
             toast.current.show({
                 severity: 'success',
@@ -52,7 +73,7 @@ const BookList = () => {
         const { newData } = e;
         try {
             await api.put(`/books/${newData.id}`, newData);
-            loadBooks(inquiry);
+            loadBooks();
 
             toast.current.show({
                 severity: 'success',
@@ -79,27 +100,17 @@ const BookList = () => {
         />
     );
 
-    const authorEditor = (options) => (
-        <Dropdown
-            value={options.value}
-            options={authors}
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Select Author"
-            onChange={(e) => options.editorCallback(e.value)}
-            className="w-full samsung-400"
-        />
-    );
-
-    const getAuthorName = (authorId) => {
-        const author = authors.find((a) => a.id === authorId);
-        return author ? author.name : '';
+    const onPageChange = (e) => {
+        setPagination((prev) => ({
+            ...prev,
+            page: Math.floor(e.first / e.rows),
+            size: e.rows,
+        }));
     };
 
     useEffect(() => {
         loadBooks();
-        loadAuthors();
-    }, []);
+    }, [loadBooks]);
 
     return (
         <div className="p-4">
@@ -131,9 +142,8 @@ const BookList = () => {
                 </p>
             </Dialog>
 
-            {/* Card and Content */}
+            {/* Card */}
             <Card className="shadow-3">
-                {/* Header Card */}
                 <div className="flex justify-content-between align-items-center mb-3">
                     <h2 className="card-title-custom m-0 samsung-bold">Book List</h2>
                     <div className="flex align-items-center gap-2">
@@ -167,14 +177,13 @@ const BookList = () => {
                 onChange={(e) => setInquiry(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                        loadBooks(inquiry);
+                        setPagination((prev) => ({ ...prev, page: 0 }));
                     }
                 }}
                 placeholder="Search book by title..."
                 className="p-inputtext-sm w-full rounded-input samsung-400 search-input"
             />
           </span>
-
                     <Button
                         icon="pi pi-sync"
                         className="p-button-text p-button-sm"
@@ -188,16 +197,17 @@ const BookList = () => {
                         }}
                         onClick={() => {
                             setInquiry('');
-                            loadBooks('');
+                            setPagination((prev) => ({ ...prev, page: 0 }));
                         }}
                         tooltip="Refresh"
                         tooltipOptions={{ position: 'top' }}
                     />
                 </div>
 
-                {/* Table */}
+                {/* DataTable */}
                 <DataTable
                     value={books}
+                    lazy
                     editMode="row"
                     dataKey="id"
                     onRowEditComplete={onRowEditComplete}
@@ -205,10 +215,28 @@ const BookList = () => {
                     onSelectionChange={(e) => setSelectedBooks(e.value)}
                     selectionMode="checkbox"
                     paginator
-                    rows={5}
+                    rows={pagination.size}
+                    totalRecords={pagination.totalRecords}
+                    first={pagination.page * pagination.size}
+                    onPage={onPageChange}
+                    rowsPerPageOptions={rowsPerPageOptions}
                     stripedRows
                     responsiveLayout="scroll"
-                    className="p-datatable-sm"
+                    className="p-datatable-sm custom-paginator-table"
+                    paginatorTemplate={{
+                        layout: 'PrevPageLink PageLinks NextPageLink RowsPerPageDropdown',
+                        RowsPerPageDropdown: (options) => (
+                            <div className="custom-rows-dropdown">
+                                <span className="text-sm">Rows per page:</span>
+                                <Dropdown
+                                    value={options.value}
+                                    options={options.options}
+                                    onChange={options.onChange}
+                                    className="p-dropdown-sm"
+                                />
+                            </div>
+                        ),
+                    }}
                 >
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
                     <Column
@@ -220,10 +248,8 @@ const BookList = () => {
                         bodyClassName="samsung-400"
                     />
                     <Column
-                        field="authorId"
+                        field="authorName"
                         header="Author"
-                        editor={authorEditor}
-                        body={(rowData) => getAuthorName(rowData.authorId)}
                         sortable
                         headerClassName="samsung-bold"
                         bodyClassName="samsung-400"

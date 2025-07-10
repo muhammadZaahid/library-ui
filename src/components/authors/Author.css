@@ -136,6 +136,31 @@
   transform: scale(1.2);
 }
 
+.p-paginator-bottom {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  padding-right: 14rem; /* agar rows-per-page ke kanan */
+  padding-left: 4rem;   /* untuk geser pagination agak ke kanan */
+}
+
+.custom-paginator-table .p-paginator-bottom {
+  position: relative;
+  justify-content: center !important;
+}
+
+.custom-rows-dropdown {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
 
 
 
