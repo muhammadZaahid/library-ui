@@ -90,7 +90,7 @@ const AuthorList = () => {
     };
 
     const textEditor = (options) => (
-        <input
+        <InputText
             type="text"
             value={options.value}
             onChange={(e) => options.editorCallback(e.target.value)}
@@ -237,6 +237,7 @@ const AuthorList = () => {
                     }}
                 >
                     <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} />
+
                     <Column
                         field="name"
                         header="Name"
@@ -245,6 +246,25 @@ const AuthorList = () => {
                         headerClassName="samsung-bold"
                         bodyClassName="samsung-400"
                     />
+
+                    <Column
+                        field="email"
+                        header="Email"
+                        editor={textEditor}
+                        sortable
+                        headerClassName="samsung-bold"
+                        bodyClassName="samsung-400"
+                    />
+
+                    <Column
+                        field="bio"
+                        header="Bio"
+                        editor={textEditor}
+                        sortable
+                        headerClassName="samsung-bold"
+                        bodyClassName="samsung-400"
+                    />
+
                     <Column
                         rowEditor
                         headerStyle={{ width: '8rem' }}

@@ -34,8 +34,13 @@ const BookForm = () => {
 
   const loadAuthors = useCallback(async () => {
     try {
-      const res = await api.get('/authors');
-      setAuthors(res.data);
+      const res = await api.get('/authors', {
+        params: {
+          page: 0,
+          size: 1000,
+        },
+      });
+      setAuthors(res.data.content || []);
     } catch (error) {
       toast.current?.show({
         severity: 'error',
@@ -129,7 +134,7 @@ const BookForm = () => {
                   name="authorId"
                   value={book.authorId}
                   onChange={(e) => setBook({ ...book, authorId: e.value })}
-                  options={authors.map((a) => ({ label: a.name, value: a.id }))}
+                  options={Array.isArray(authors) ? authors.map((a) => ({ label: a.name, value: a.id })) : []}
                   placeholder="Select Author"
                   className="p-dropdown-sm w-full samsung-400 rounded-input"
                   required
